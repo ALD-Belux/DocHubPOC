@@ -11,11 +11,18 @@ using Serilog;
 
 namespace DocHubPOC.Models
 {
+    /// <summary>
+    /// This class implement the IFileRepository Interface for Azure
+    /// </summary>
     public class FileRepository : IFileRepository
     {
         private ILogger _thisLog;
         private CloudBlobClient _blobClient;
 
+        /// <summary>
+        /// Initialize the class with logging provider and CloudBlobClient.
+        /// It use StorageUtils to obtain the correct Azure Storge information.
+        /// </summary>
         public FileRepository()
         {
             _thisLog = Log.ForContext<FileRepository>();
@@ -75,92 +82,130 @@ namespace DocHubPOC.Models
             var continuationToken = new BlobContinuationToken();
             List<string> listBlobs = new List<string>();
 
-            CloudBlobContainer blolbContainer = _blobClient.GetContainerReference(container);
-
-            do
+            try
             {
-                _thisLog.Debug("GetAllFilesInContainer - Obtain one Azure API limit batch (5000?)");
-                var listBlobSegment = await blolbContainer.ListBlobsSegmentedAsync(continuationToken);
-                continuationToken = listBlobSegment.ContinuationToken;
+                CloudBlobContainer blolbContainer = _blobClient.GetContainerReference(container);
 
-                _thisLog.Debug("GetAllFilesInContainer - Generate List");
-                foreach (CloudBlockBlob item in listBlobSegment.Results)
+                do
                 {
-                    listBlobs.Add(item.Name);
-                }
-            } while (continuationToken != null);
+                    _thisLog.Debug("GetAllFilesInContainer - Obtain one Azure API limit batch (5000?)");
+                    var listBlobSegment = await blolbContainer.ListBlobsSegmentedAsync(continuationToken);
+                    continuationToken = listBlobSegment.ContinuationToken;
 
-            _thisLog.Debug("GetAllFilesInContainer - Return List");
-            return listBlobs;
+                    _thisLog.Debug("GetAllFilesInContainer - Generate List");
+                    foreach (CloudBlockBlob item in listBlobSegment.Results)
+                    {
+                        listBlobs.Add(item.Name);
+                    }
+                } while (continuationToken != null);
+
+                _thisLog.Debug("GetAllFilesInContainer - Return List");
+                return listBlobs;
+            }
+            catch (Exception ex)
+            {
+                _thisLog.Error("GetAllFilesInContainer - Error: {@ex}", ex);
+            }
+
+            return null;
         }
 
         public async Task<FileItem> Add(FileUpload upload)
         {
             _thisLog.Debug("Add - Get Blob container");
-            
-            CloudBlobContainer container = _blobClient.GetContainerReference(upload.Container);
 
-            await container.CreateIfNotExistsAsync();
-
-            string lastID = null;
-
-
-            _thisLog.Debug("Add - Parse uploaded files");
-            foreach (var file in upload.Files)
+            try
             {
-                if (file.Length > 0)
+                CloudBlobContainer container = _blobClient.GetContainerReference(upload.Container);
+
+                await container.CreateIfNotExistsAsync();
+
+                string lastID = null;
+
+
+                _thisLog.Debug("Add - Parse uploaded files");
+                foreach (var file in upload.Files)
                 {
-                    var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                    _thisLog.Debug("Add - Will upload {@filename}", fileName);
-                    CloudBlockBlob blockBlob = container.GetBlockBlobReference(fileName);
-                    blockBlob.Properties.ContentType = file.ContentType;
-                    await blockBlob.UploadFromStreamAsync(file.OpenReadStream());
-                    _thisLog.Information("Add - {@filename} uploaded", fileName);
-                    lastID = fileName;
+                    if (file.Length > 0)
+                    {
+                        var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                        _thisLog.Debug("Add - Will upload {@filename}", fileName);
+                        CloudBlockBlob blockBlob = container.GetBlockBlobReference(fileName);
+                        blockBlob.Properties.ContentType = file.ContentType;
+                        await blockBlob.UploadFromStreamAsync(file.OpenReadStream());
+                        _thisLog.Information("Add - {@filename} uploaded", fileName);
+                        lastID = fileName;
+                    }
                 }
+
+                return new FileItem { Container = upload.Container, Id = lastID };
+            }
+            catch (Exception ex)
+            {
+                _thisLog.Error("Add - Error: {@ex}", ex);
             }
 
-            return new FileItem { Container = upload.Container, Id = lastID };
+            return null;            
         }
 
         public async Task<string> Find(string container, string id)
         {
             _thisLog.Debug("Find - Container {@container} file {@id}", container, id);
 
-            CloudBlobContainer blolbContainer = _blobClient.GetContainerReference(container);
-            CloudBlockBlob blockBlob = blolbContainer.GetBlockBlobReference(id);
-
-            if (await blockBlob.ExistsAsync())
+            try
             {
-                _thisLog.Information("Find - Blob {@container}\\{@id} exist. Generate access." , container, id);
-                var sasConstraints = new SharedAccessBlobPolicy();
-                sasConstraints.SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5);
-                sasConstraints.SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(10);
-                sasConstraints.Permissions = SharedAccessBlobPermissions.Read;
+                CloudBlobContainer blolbContainer = _blobClient.GetContainerReference(container);
+                CloudBlockBlob blockBlob = blolbContainer.GetBlockBlobReference(id);
 
-                var sasBlobToken = blockBlob.GetSharedAccessSignature(sasConstraints);
+                if (await blockBlob.ExistsAsync())
+                {
 
-                return blockBlob.Uri + sasBlobToken;
+                    _thisLog.Information("Find - Blob {@container}\\{@id} exist. Generate access.", container, id);
+                    // Return an uri to the file with a limited time validity (sasConstraints)
+                    var sasConstraints = new SharedAccessBlobPolicy();
+                    sasConstraints.SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5);
+                    sasConstraints.SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(10);
+                    sasConstraints.Permissions = SharedAccessBlobPermissions.Read;
+
+                    var sasBlobToken = blockBlob.GetSharedAccessSignature(sasConstraints);
+
+                    return blockBlob.Uri + sasBlobToken;
+                }
+
+                _thisLog.Debug("Find - Container {@container} with file {@id} doesn't exist");
+                return null;
             }
-
-            _thisLog.Debug("Find - Container {@container} with file {@id} doesn't exist");
+            catch (Exception ex)
+            {
+                _thisLog.Error("Find - Error: {@ex}", ex);
+            }
             return null;
-            
         }
 
         public async Task<FileItem> Remove(string container, string id)
         {
             _thisLog.Debug("Remove - Container {@container} file {@id}", container, id);
 
-            CloudBlobContainer blolbContainer = _blobClient.GetContainerReference(container);
-            CloudBlockBlob blockBlob = blolbContainer.GetBlockBlobReference(id);
+            try
+            {
+                CloudBlobContainer blolbContainer = _blobClient.GetContainerReference(container);
+                CloudBlockBlob blockBlob = blolbContainer.GetBlockBlobReference(id);
 
-            FileItem result = new FileItem { Container = container, Id = id };
+                FileItem result = new FileItem { Container = container, Id = id };
 
-            _thisLog.Information("Remove - Try to delete Container {@container} file {@id}", container, id);
-            await blockBlob.DeleteIfExistsAsync();
+                _thisLog.Information("Remove - Try to delete Container {@container} file {@id}", container, id);
+                if(await blockBlob.DeleteIfExistsAsync())
+                {
+                    return result;
+                }                
+            }
+            catch (Exception ex)
+            {
 
-            return result;
+                _thisLog.Error("Remove - Error: {@ex}", ex);
+            }
+
+            return null;
         }
     }
 }

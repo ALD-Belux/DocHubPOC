@@ -6,6 +6,9 @@ using Microsoft.AspNet.Http;
 
 namespace DocHubPOC.Models
 {
+    /// <summary>
+    /// Represent an upload with a "mutli-part form" like POST request
+    /// </summary>
     public class FileUpload
     {
         public string Container { get; set; }

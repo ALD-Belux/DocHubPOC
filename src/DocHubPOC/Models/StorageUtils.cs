@@ -7,10 +7,16 @@ using Microsoft.Extensions.Configuration;
 using Serilog;
 
 namespace DocHubPOC.Models
-{
+{   
     public static class StorageUtils
     {
-
+        /// <summary>
+        /// This static method return the Azure Storage parameters
+        /// from AzureStorageSettings.json or environment variables.
+        /// 
+        /// Either the Azure Storage Emulator parameters or the actual
+        /// Azure Storage.
+        /// </summary>
         public static CloudStorageAccount StorageAccount
         {
             get

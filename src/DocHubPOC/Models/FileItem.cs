@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace DocHubPOC.Models
 {
+    /// <summary>
+    /// Represent an Item stored in a container (logical/security partition)
+    /// </summary>
     public class FileItem
     {
         public string Container { get; set; }
