@@ -39,7 +39,7 @@ namespace DocHubPOC.Models
                 }
 
                 _thisLog.Debug("Use production key");
-                string key = config.Get("AppSettings:StorageAccountAccessKey");
+                string key = config.Get<string>("AppSettings:StorageAccountAccessKey");
                 string connectionString = String.Format("DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}", account, key);
                 return CloudStorageAccount.Parse(connectionString);
             }

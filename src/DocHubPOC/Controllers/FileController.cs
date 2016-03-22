@@ -42,7 +42,7 @@ namespace DocHubPOC.Controllers
         /// </summary>
         /// <param name="adminKey">The provided admin key</param>
         /// <returns>Send the result over https</returns>
-        [HttpGet("admin/{adminKey}", Name = "GetContainers")]
+        [HttpGet("list/{adminKey}", Name = "GetContainers")]
         public async Task<IActionResult> GetAllContainer(string adminKey)
         {
             _thisLog.Information("Try to Get all containers");
@@ -75,7 +75,7 @@ namespace DocHubPOC.Controllers
         /// <param name="adminKey">The administration key</param>
         /// <param name="container">The container to get files from</param>
         /// <returns>A list of files</returns>
-        [HttpGet("admin/{adminKey}/{container}", Name = "GetFilesList")]
+        [HttpGet("list/{adminKey}/{container}", Name = "GetFilesList")]
         public async Task<IActionResult> GetFilesList(string adminKey, string container)
         {
             _thisLog.Information("Try to Get all files in {@container}", container);
