@@ -25,7 +25,7 @@ namespace DocHubPOC
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Trace()
-                .WriteTo.LiterateConsole()                
+                .WriteTo.LiterateConsole()
                 .CreateLogger();            
 
             if (env.IsEnvironment("Development"))
