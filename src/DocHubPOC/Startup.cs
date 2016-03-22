@@ -20,7 +20,8 @@ namespace DocHubPOC
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables();
-
+            
+            //Create a global Serilog objet/configuration
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Trace()
@@ -31,6 +32,7 @@ namespace DocHubPOC
             {
                 // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
                 builder.AddApplicationInsightsSettings(developerMode: true);
+                // use user-secret for dev
                 builder.AddUserSecrets();
             }
 
@@ -61,7 +63,7 @@ namespace DocHubPOC
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));            
             loggerFactory.AddDebug();
 
-
+            //Initialize Serilog
             loggerFactory.AddSerilog();
             Log.Logger.Information("Hello, Serilog!");
             Log.Information("The global logger has been configured");

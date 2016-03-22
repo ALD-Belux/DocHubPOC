@@ -10,9 +10,6 @@ using Microsoft.AspNet.Http;
 using Microsoft.Extensions.OptionsModel;
 using Serilog;
 
-//todo
-//check with return null
-
 namespace DocHubPOC.Controllers
 {
     [Route("api/[controller]")]
@@ -88,7 +85,15 @@ namespace DocHubPOC.Controllers
             if (adminKey == _config.Value.AdminKey)
             {
                 _thisLog.Information("Admin Key is good. Executing \"FileItems.GetAllFilesInContainer({@container})\"", container);
-                return Json(await FileItems.GetAllFilesInContainer(container));
+                var result = await FileItems.GetAllFilesInContainer(container);
+
+                if (result != null)
+                {
+                    return Json(result);
+                }
+
+                return HttpNotFound();
+
             }
             else
             {
@@ -167,7 +172,14 @@ namespace DocHubPOC.Controllers
                 _thisLog.Information("Admin Key is good. Executing \"FileItems.Add({@item})\"", item);
                 item.Container = item.Container.ToLower();
                 FileItem fItem = await FileItems.Add(item);
-                return CreatedAtRoute("GetFile", new { controller = "File", container = fItem.Container, id = fItem.Id }, fItem);
+
+                if (fItem != null)
+                {
+                    _thisLog.Information("Unable to upload file");
+                    return CreatedAtRoute("GetFile", new { controller = "File", container = fItem.Container, id = fItem.Id }, fItem);
+                }
+
+                return HttpBadRequest();
             }
             else
             {
