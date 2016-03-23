@@ -57,7 +57,7 @@ function Enable-PackageDownloader{
                 'Downloading [{0}] to [{1}]' -f $pkgDownloaderDownloadUrl,$expectedPath | Write-Verbose
                 (New-Object System.Net.WebClient).DownloadFile($pkgDownloaderDownloadUrl, $expectedPath)
             }
-        
+
             if(!$expectedPath){throw ('Unable to download package-downloader.psm1')}
 
             'importing module [{0}]' -f $expectedPath | Write-Output
@@ -86,7 +86,6 @@ function Enable-PublishModule{
 }
 
 try{
-
     if (!(Enable-PublishModule)){
         Enable-PackageDownloader
         Enable-NuGetModule -name 'publish-module' -version $publishModuleVersion -nugetUrl $nugetUrl

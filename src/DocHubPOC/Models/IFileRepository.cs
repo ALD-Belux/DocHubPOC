@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DocHubPOC.Models
@@ -18,6 +16,14 @@ namespace DocHubPOC.Models
         Task<FileItem> Add(FileUpload upload);
 
         /// <summary>
+        /// Find and return a link to a file in a specific container (logical/security partition).
+        /// </summary>
+        /// <param name="container">The container</param>
+        /// <param name="id">The file</param>
+        /// <returns>A link to the file or null</returns>
+        Task<string> Find(string container, string id);
+
+        /// <summary>
         /// Used for administration. Return all the container (logical/security partition)
         /// </summary>
         /// <returns>An IEnumerable of the container</returns>
@@ -29,15 +35,6 @@ namespace DocHubPOC.Models
         /// <param name="container">The container to list files from</param>
         /// <returns>An IEnumerable of the files in the given container</returns>
         Task<IEnumerable<string>> GetAllFilesInContainer(string container);
-
-        /// <summary>
-        /// Find and return a link to a file in a specific container (logical/security partition).
-        /// </summary>
-        /// <param name="container">The container</param>
-        /// <param name="id">The file</param>
-        /// <returns>A link to the file or null</returns>
-        Task<string> Find(string container, string id);
-
         /// <summary>
         /// Usedd for administration. Delete a file in a given container (logical/security partition).
         /// </summary>

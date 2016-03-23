@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
-using Microsoft.Extensions.Configuration;
 using Serilog;
+using System;
 
 namespace DocHubPOC.Models
-{   
+{
     public static class StorageUtils
     {
         /// <summary>
         /// This static method return the Azure Storage parameters
         /// from AzureStorageSettings.json or environment variables.
-        /// 
+        ///
         /// Either the Azure Storage Emulator parameters or the actual
         /// Azure Storage.
         /// </summary>

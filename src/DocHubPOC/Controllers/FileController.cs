@@ -1,14 +1,9 @@
-﻿using System;
-using Microsoft.AspNet.Mvc;
-using DocHubPOC.Models;
-using System.Collections.Generic;
+﻿using DocHubPOC.Models;
 using Microsoft.AspNet.Hosting;
-using System.Threading.Tasks;
-using System.IO;
-using Microsoft.Net.Http.Headers;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.OptionsModel;
 using Serilog;
+using System.Threading.Tasks;
 
 namespace DocHubPOC.Controllers
 {
@@ -60,8 +55,8 @@ namespace DocHubPOC.Controllers
                 {
                     _thisLog.Information("No result returned");
                     return HttpNotFound();
-                }                
-            } 
+                }
+            }
             else
             {
                 _thisLog.Information("Admin Key is not good!");
@@ -93,7 +88,6 @@ namespace DocHubPOC.Controllers
                 }
 
                 return HttpNotFound();
-
             }
             else
             {
@@ -164,7 +158,6 @@ namespace DocHubPOC.Controllers
         public async Task<IActionResult> Upload(FileUpload item, string adminKey)
         {
             _thisLog.Information("Try to post {@id} file in {@container}", item.Files, item.Container);
-
 
             //the administration key is stored using user-secret in dev and environment variable in prod.
             if (adminKey == _config.Value.AdminKey)

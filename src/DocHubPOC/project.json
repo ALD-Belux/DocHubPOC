@@ -22,13 +22,14 @@
     "Serilog.Sinks.Literate": "2.0.0-beta-21",
     "Serilog.Sinks.Console": "2.0.0-beta-513",
     "Serilog.Sinks.Trace": "2.0.0-beta-516",
-    "Serilog.Sinks.TextWriter": "2.0.0-beta-519"
+    "Serilog.Sinks.TextWriter": "2.0.0-beta-519",
+    "Serilog.Sinks.RollingFile": "2.0.0-beta-519"
   },
   "commands": {
     "web": "Microsoft.AspNet.Server.Kestrel"
   },
   "frameworks": {
-    "dnxcore50": {}
+    "dnxcore50": { }
   },
   "exclude": [
     "wwwroot",

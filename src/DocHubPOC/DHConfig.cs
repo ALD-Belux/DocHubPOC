@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace DocHubPOC
+﻿namespace DocHubPOC
 {
     /// <summary>
     /// This class is used to store yped configuration variables.
@@ -12,9 +7,8 @@ namespace DocHubPOC
     {
         public string AdminKey { get; set; }
 
-        public DHConfig() 
+        public DHConfig()
         {
-
         }
     }
 }

@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.Net.Http.Headers;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using Microsoft.Net.Http.Headers;
 using Serilog;
-
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DocHubPOC.Models
 {
@@ -16,8 +13,8 @@ namespace DocHubPOC.Models
     /// </summary>
     public class FileRepository : IFileRepository
     {
-        private ILogger _thisLog;
         private CloudBlobClient _blobClient;
+        private ILogger _thisLog;
 
         /// <summary>
         /// Initialize the class with logging provider and CloudBlobClient.
@@ -39,6 +36,76 @@ namespace DocHubPOC.Models
                 Log.Error("Error with FileRepository Constructor: {@ex}", ex);
                 throw ex;
             }
+        }
+
+        public async Task<FileItem> Add(FileUpload upload)
+        {
+            _thisLog.Debug("Add - Get Blob container");
+
+            try
+            {
+                CloudBlobContainer container = _blobClient.GetContainerReference(upload.Container);
+
+                await container.CreateIfNotExistsAsync();
+
+                string lastID = null;
+
+                _thisLog.Debug("Add - Parse uploaded files");
+                foreach (var file in upload.Files)
+                {
+                    if (file.Length > 0)
+                    {
+                        var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                        _thisLog.Debug("Add - Will upload {@filename}", fileName);
+                        CloudBlockBlob blockBlob = container.GetBlockBlobReference(fileName);
+                        blockBlob.Properties.ContentType = file.ContentType;
+                        await blockBlob.UploadFromStreamAsync(file.OpenReadStream());
+                        _thisLog.Information("Add - {@filename} uploaded", fileName);
+                        lastID = fileName;
+                    }
+                }
+
+                return new FileItem { Container = upload.Container, Id = lastID };
+            }
+            catch (Exception ex)
+            {
+                _thisLog.Error("Add - Error: {@ex}", ex);
+            }
+
+            return null;
+        }
+
+        public async Task<string> Find(string container, string id)
+        {
+            _thisLog.Debug("Find - Container {@container} file {@id}", container, id);
+
+            try
+            {
+                CloudBlobContainer blolbContainer = _blobClient.GetContainerReference(container);
+                CloudBlockBlob blockBlob = blolbContainer.GetBlockBlobReference(id);
+
+                if (await blockBlob.ExistsAsync())
+                {
+                    _thisLog.Information("Find - Blob {@container}\\{@id} exist. Generate access.", container, id);
+                    // Return an uri to the file with a limited time validity (sasConstraints)
+                    var sasConstraints = new SharedAccessBlobPolicy();
+                    sasConstraints.SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5);
+                    sasConstraints.SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(10);
+                    sasConstraints.Permissions = SharedAccessBlobPermissions.Read;
+
+                    var sasBlobToken = blockBlob.GetSharedAccessSignature(sasConstraints);
+
+                    return blockBlob.Uri + sasBlobToken;
+                }
+
+                _thisLog.Debug("Find - Container {@container} with file {@id} doesn't exist");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _thisLog.Error("Find - Error: {@ex}", ex);
+            }
+            return null;
         }
 
         public async Task<IEnumerable<string>> GetAllContainer()
@@ -65,9 +132,8 @@ namespace DocHubPOC.Models
 
                 _thisLog.Debug("GetAllContainer - Return List");
                 return listContainer;
-                
             }
-            catch (Exception ex )
+            catch (Exception ex)
             {
                 _thisLog.Error("Something went wrong during \"GetAllContainer()\": {@ex}", ex);
             }
@@ -75,7 +141,7 @@ namespace DocHubPOC.Models
             return null;
         }
 
-        public async Task <IEnumerable<string>> GetAllFilesInContainer(string container)
+        public async Task<IEnumerable<string>> GetAllFilesInContainer(string container)
         {
             _thisLog.Information("GetAllFilesInContainer - Get Blob container {@container}", container);
 
@@ -110,78 +176,6 @@ namespace DocHubPOC.Models
             return null;
         }
 
-        public async Task<FileItem> Add(FileUpload upload)
-        {
-            _thisLog.Debug("Add - Get Blob container");
-
-            try
-            {
-                CloudBlobContainer container = _blobClient.GetContainerReference(upload.Container);
-
-                await container.CreateIfNotExistsAsync();
-
-                string lastID = null;
-
-
-                _thisLog.Debug("Add - Parse uploaded files");
-                foreach (var file in upload.Files)
-                {
-                    if (file.Length > 0)
-                    {
-                        var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                        _thisLog.Debug("Add - Will upload {@filename}", fileName);
-                        CloudBlockBlob blockBlob = container.GetBlockBlobReference(fileName);
-                        blockBlob.Properties.ContentType = file.ContentType;
-                        await blockBlob.UploadFromStreamAsync(file.OpenReadStream());
-                        _thisLog.Information("Add - {@filename} uploaded", fileName);
-                        lastID = fileName;
-                    }
-                }
-
-                return new FileItem { Container = upload.Container, Id = lastID };
-            }
-            catch (Exception ex)
-            {
-                _thisLog.Error("Add - Error: {@ex}", ex);
-            }
-
-            return null;            
-        }
-
-        public async Task<string> Find(string container, string id)
-        {
-            _thisLog.Debug("Find - Container {@container} file {@id}", container, id);
-
-            try
-            {
-                CloudBlobContainer blolbContainer = _blobClient.GetContainerReference(container);
-                CloudBlockBlob blockBlob = blolbContainer.GetBlockBlobReference(id);
-
-                if (await blockBlob.ExistsAsync())
-                {
-
-                    _thisLog.Information("Find - Blob {@container}\\{@id} exist. Generate access.", container, id);
-                    // Return an uri to the file with a limited time validity (sasConstraints)
-                    var sasConstraints = new SharedAccessBlobPolicy();
-                    sasConstraints.SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5);
-                    sasConstraints.SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(10);
-                    sasConstraints.Permissions = SharedAccessBlobPermissions.Read;
-
-                    var sasBlobToken = blockBlob.GetSharedAccessSignature(sasConstraints);
-
-                    return blockBlob.Uri + sasBlobToken;
-                }
-
-                _thisLog.Debug("Find - Container {@container} with file {@id} doesn't exist");
-                return null;
-            }
-            catch (Exception ex)
-            {
-                _thisLog.Error("Find - Error: {@ex}", ex);
-            }
-            return null;
-        }
-
         public async Task<FileItem> Remove(string container, string id)
         {
             _thisLog.Debug("Remove - Container {@container} file {@id}", container, id);
@@ -194,14 +188,13 @@ namespace DocHubPOC.Models
                 FileItem result = new FileItem { Container = container, Id = id };
 
                 _thisLog.Information("Remove - Try to delete Container {@container} file {@id}", container, id);
-                if(await blockBlob.DeleteIfExistsAsync())
+                if (await blockBlob.DeleteIfExistsAsync())
                 {
                     return result;
-                }                
+                }
             }
             catch (Exception ex)
             {
-
                 _thisLog.Error("Remove - Error: {@ex}", ex);
             }
 

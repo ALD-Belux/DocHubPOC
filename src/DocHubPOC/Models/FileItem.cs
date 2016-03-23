@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace DocHubPOC.Models
+﻿namespace DocHubPOC.Models
 {
     /// <summary>
     /// Represent an Item stored in a container (logical/security partition)
@@ -12,10 +7,12 @@ namespace DocHubPOC.Models
     {
         public string Container { get; set; }
         public string Id { get; set; }
-        public string Uid {
+
+        public string Uid
+        {
             get
             {
-                return Container + Id;    
+                return Container + Id;
             }
         }
     }
