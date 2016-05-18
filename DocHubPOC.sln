@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FEA85077-80E9-4994-9844-DE89CD1316A8}"
 EndProject
@@ -11,8 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "DocHubPOC", "src\DocHubPOC\DocHubPOC.xproj", "{A0ED1A6E-8C60-4CA5-BBFA-76946B1D26DB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebJob-DocHUB", "WebJob-DocHUB\WebJob-DocHUB.csproj", "{9B4A8254-BF6F-4665-9F58-49E71992DCC6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,10 +22,6 @@ Global
 		{A0ED1A6E-8C60-4CA5-BBFA-76946B1D26DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0ED1A6E-8C60-4CA5-BBFA-76946B1D26DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0ED1A6E-8C60-4CA5-BBFA-76946B1D26DB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9B4A8254-BF6F-4665-9F58-49E71992DCC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B4A8254-BF6F-4665-9F58-49E71992DCC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9B4A8254-BF6F-4665-9F58-49E71992DCC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9B4A8254-BF6F-4665-9F58-49E71992DCC6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
