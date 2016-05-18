@@ -14,7 +14,6 @@
     "Serilog.Extensions.Logging": "1.0.0-rc1-final-10092",
     "Serilog.Sinks.Trace": "2.0.0-beta-700",
     "WindowsAzure.Storage": "7.0.1-preview",
-    "Microsoft.ApplicationInsights.AspNet": "1.0.0-rc1-update4",
     "Serilog.Sinks.Console": "2.0.0-beta-700",
     "Serilog.Sinks.TextWriter": "2.0.0-beta-700",
     "Microsoft.Extensions.Configuration.Json": "1.0.0-rc1-final",

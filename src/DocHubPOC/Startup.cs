@@ -25,8 +25,6 @@ namespace DocHubPOC
 
             if (env.IsEnvironment("Development"))
             {
-                // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
-                builder.AddApplicationInsightsSettings(developerMode: true);
                 // use user-secret for dev
                 builder.AddUserSecrets();
             }
@@ -40,9 +38,6 @@ namespace DocHubPOC
         // This method gets called by the runtime. Use this method to add services to the container
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add framework services.
-            services.AddApplicationInsightsTelemetry(Configuration);
-
             services.AddMvc();
 
             //add our repository here
@@ -62,11 +57,7 @@ namespace DocHubPOC
             Log.Information("The global logger has been configured");
 
             app.UseIISPlatformHandler();
-
-            app.UseApplicationInsightsRequestTelemetry();
-
-            app.UseApplicationInsightsExceptionTelemetry();
-
+            
             app.UseStaticFiles();
 
             app.UseMvc();
