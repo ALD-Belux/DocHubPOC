@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace DocHubPOC.Models
@@ -22,6 +23,14 @@ namespace DocHubPOC.Models
         /// <param name="id">The file</param>
         /// <returns>A link to the file or null</returns>
         Task<string> Find(string container, string id);
+
+        /// <summary>
+        /// Return a zip containing the requested files in a specific container
+        /// </summary>
+        /// <param name="container">The container name</param>
+        /// <param name="selectedFiles">A string containing ";" separated file names</param>
+        /// <returns>A memorystream representing a zip file file</returns>
+        Task<MemoryStream> GetZip(string container, string selectedFiles);
 
         /// <summary>
         /// Used for administration. Return all the container (logical/security partition)

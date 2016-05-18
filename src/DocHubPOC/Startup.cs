@@ -20,9 +20,7 @@ namespace DocHubPOC
                 .AddEnvironmentVariables();
             //Create a global Serilog objet/configuration
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug().
-                WriteTo.RollingFile(Path.Combine(
-                    env.WebRootPath, "log-{Date}.txt"), fileSizeLimitBytes: 102400)
+                .ReadFrom.Configuration(builder.Build())           
                 .CreateLogger();
 
             if (env.IsEnvironment("Development"))
@@ -57,7 +55,6 @@ namespace DocHubPOC
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
 
             //Initialize Serilog
             loggerFactory.AddSerilog();

@@ -118,6 +118,37 @@ namespace DocHubPOC.Controllers
         }
 
         /// <summary>
+        /// Return a zip containing the requested files in a specific container
+        /// </summary>
+        /// <param name="container">The container name</param>
+        /// <param name="selectedFiles">A string containing ";" separated file names</param>
+        /// <returns>A zip file</returns>
+        [HttpGet("get/zip", Name = "GetZip")]
+        public async Task<IActionResult> GetZip(string container, string selectedFiles)
+        {
+            _thisLog.Information("Request Zip File");
+
+            try
+            {
+                var memStream = await FileItems.GetZip(container, selectedFiles);
+
+                _thisLog.Information("Return the Zip File");
+
+                if (memStream.Equals(null))
+                {
+                    _thisLog.Information("got a null answer");
+                    return HttpNotFound();
+                }
+                _thisLog.Information("Return the Zip File");
+                return new FileStreamResult(memStream, "application/zip") { FileDownloadName = string.Format("MyALD-{0:yyyyMMddHHmmssfff}.zip", System.DateTime.Now) };
+            }
+            catch (System.Exception)
+            {
+                return HttpNotFound();
+            }
+        }
+
+        /// <summary>
         /// Delete a file in a container(logical/security partition). Protected with an administration key.
         /// </summary>
         /// <param name="adminKey">The administration key</param>
@@ -168,10 +199,11 @@ namespace DocHubPOC.Controllers
 
                 if (fItem != null)
                 {
-                    _thisLog.Information("Unable to upload file");
+                    _thisLog.Information("File uploaded");
                     return CreatedAtRoute("GetFile", new { controller = "File", container = fItem.Container, id = fItem.Id }, fItem);
                 }
 
+                _thisLog.Information("Unable to upload file");
                 return HttpBadRequest();
             }
             else

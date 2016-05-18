@@ -5,25 +5,27 @@
     "emitEntryPoint": true
   },
   "dependencies": {
-    "Microsoft.ApplicationInsights.AspNet": "1.0.0-rc1-update2",
     "Microsoft.AspNet.IISPlatformHandler": "1.0.0-rc1-final",
     "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
     "Microsoft.AspNet.Server.Kestrel": "1.0.0-rc1-final",
     "Microsoft.AspNet.StaticFiles": "1.0.0-rc1-final",
     "Microsoft.Extensions.Configuration.FileProviderExtensions": "1.0.0-rc1-final",
+    "Microsoft.Extensions.SecretManager": "1.0.0-rc1-final",
+    "Serilog.Extensions.Logging": "1.0.0-rc1-final-10092",
+    "Serilog.Sinks.Trace": "2.0.0-beta-700",
+    "WindowsAzure.Storage": "7.0.1-preview",
+    "Microsoft.ApplicationInsights.AspNet": "1.0.0-rc1-update4",
+    "Serilog.Sinks.Console": "2.0.0-beta-700",
+    "Serilog.Sinks.TextWriter": "2.0.0-beta-700",
     "Microsoft.Extensions.Configuration.Json": "1.0.0-rc1-final",
+    "Microsoft.Extensions.Configuration.UserSecrets": "1.0.0-rc1-final",
     "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
     "Microsoft.Extensions.Logging.Console": "1.0.0-rc1-final",
     "Microsoft.Extensions.Logging.Debug": "1.0.0-rc1-final",
-    "Microsoft.Extensions.SecretManager": "1.0.0-rc1-final",
-    "WindowsAzure.Storage": "6.2.2-preview",
-    "Microsoft.Extensions.Configuration.UserSecrets": "1.0.0-rc1-final",
-    "Serilog.Extensions.Logging": "1.0.0-rc1-final-10092",
-    "Serilog.Sinks.Literate": "2.0.0-beta-21",
-    "Serilog.Sinks.Console": "2.0.0-beta-513",
-    "Serilog.Sinks.Trace": "2.0.0-beta-516",
-    "Serilog.Sinks.TextWriter": "2.0.0-beta-519",
-    "Serilog.Sinks.RollingFile": "2.0.0-beta-519"
+    "Serilog.Sinks.Literate": "2.0.0-beta-23",
+    "Serilog.Sinks.RollingFile": "2.0.0-beta-700",
+    "System.IO.Compression.ZipFile": "4.0.0",
+    "Serilog.Settings.Configuration": "2.0.0-beta-6"
   },
   "commands": {
     "web": "Microsoft.AspNet.Server.Kestrel"
