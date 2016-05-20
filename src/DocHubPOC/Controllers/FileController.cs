@@ -118,6 +118,27 @@ namespace DocHubPOC.Controllers
         }
 
         /// <summary>
+        /// Return true if the file in a specific container exist
+        /// </summary>
+        /// <param name="container">The container</param>
+        /// <param name="id">The file</param>
+        /// <returns>OK/200 if exist 404 if not</returns>
+        [HttpGet("exist/{container}/{id}", Name = "ExistFile")]
+        public async Task<IActionResult> ExistFile(string container, string id)
+        {
+            _thisLog.Information("Try to verify if {@id} file in {@container} exist", id, container);
+            container = container.ToLower();
+            var exist = await FileItems.Exist(container, id);
+            if (!exist)
+            {
+                _thisLog.Information("File {@id} not found in {@container}", id, container);
+                return HttpNotFound();
+            }
+            _thisLog.Information("File {@id} found in {@container} - Return true", id, container);
+            return Ok();
+        }
+
+        /// <summary>
         /// Return a zip containing the requested files in a specific container
         /// </summary>
         /// <param name="container">The container name</param>

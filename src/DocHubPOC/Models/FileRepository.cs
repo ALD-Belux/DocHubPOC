@@ -110,6 +110,24 @@ namespace DocHubPOC.Models
             return null;
         }
 
+        public async Task<bool> Exist(string container, string id)
+        {
+            _thisLog.Debug("Exist - Container {@container} file {@id}", container, id);
+
+            try
+            {
+                CloudBlobContainer blolbContainer = _blobClient.GetContainerReference(container);
+                CloudBlockBlob blockBlob = blolbContainer.GetBlockBlobReference(id);
+                return await blockBlob.ExistsAsync();
+            }
+            catch (Exception ex)
+            {
+                _thisLog.Error("Find - Error: {@ex}", ex);
+            }
+
+            return false;
+        }
+
         public async Task<IEnumerable<string>> GetAllContainer()
         {
             _thisLog.Debug("GetAllContainer - Get Storage Account and BlobClient");

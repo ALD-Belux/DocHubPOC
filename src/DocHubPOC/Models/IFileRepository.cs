@@ -25,6 +25,14 @@ namespace DocHubPOC.Models
         Task<string> Find(string container, string id);
 
         /// <summary>
+        /// Return true if the file in a specific container exist
+        /// </summary>
+        /// <param name="container">The container</param>
+        /// <param name="id">The file</param>
+        /// <returns>True if the file existe, false if not</returns>
+        Task<bool> Exist(string container, string id);
+        
+        /// <summary>
         /// Return a zip containing the requested files in a specific container
         /// </summary>
         /// <param name="container">The container name</param>
